@@ -5,8 +5,6 @@ using namespace std;
 int main() {
 //	cout << ImageSRBasic::FileConfig::getModelType("realesrgan-anime") << "\n";
 	using namespace std::filesystem;
-	_wchdir(L"D:\\");
-	cout << current_path()  << "\n";
 	path p("output\\out sdp");
 	cout << p << "\n";
 	cout << p.string() << "\n";
