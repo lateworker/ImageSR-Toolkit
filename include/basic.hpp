@@ -20,9 +20,9 @@ namespace ImageSRBasic {
 	auto execute(std::string s) { return system(s.c_str()); }
 
 	class FileConfig {
+	protected:
 		path inputPath, outputPath; // these paths are all unquoted
 		std::string model, scale, denoise, syncgap; // not each model has all these parameters
-	protected:
 		static path ROOTPATH;
 	public:
 		FileConfig() {
@@ -30,8 +30,8 @@ namespace ImageSRBasic {
 			model = scale = denoise = syncgap = "";
 		}
 
-		bool setInputPath(const path& pathIn);
-		bool setOutputPath(const std::string& pathOut);
+		bool setInputPath(const path& inputPath);
+		bool setOutputPath(const path& outputPath);
 		bool setModelInfo(const std::vector<std::string>& modelConfig);
 
 		path getInputPath() const;
@@ -43,31 +43,50 @@ namespace ImageSRBasic {
 		void processAsFile() const;
 	};
 	
-	class DirConfig : public FileConfig {
-		std::string errorPath, selector;
-		bool treeRestore, subdirProcess, emptydirRebuild, errorBackup;
+	class Config : public FileConfig {
+	protected:
+		std::string selector;
+		bool treeRestore, subdirProcess, emptydirRebuild;
+		path errorPath;
+		bool errorBackup;
 	public:
-		using FileConfig::FileConfig;
-		DirConfig() {
+		bool isFile;
+		Config() : FileConfig() {
+			inputPath = "input";
+			outputPath = "output";
+			isFile = false;
 			selector = "*";
 			treeRestore = true;
 			subdirProcess = true;
 			emptydirRebuild = false;
+			errorPath = "";
 			errorBackup = true;
 		}
 		
-//		std::string getErrorPath() const;
-//		bool setErrorPath(const std::string& path);
+		bool setInputPath(const path& inputPath); // the function here is different from that in FileConfig, the logic of return is not the same, and there's more task should be finished here.
+		bool setSelector(const std::string& selector);
+		bool setTreeRestore(bool treeRestore);
+		bool setSubdirProcess(bool subdirProcess);
+		bool setEmptydirRebuild(bool emptydirRebuild);
+		bool setErrorPath(const path& pathError);
+		bool setErrorBackup(bool errorBackup);
+		
+		std::string getSelector() const;
+		bool getTreeRestore() const;
+		bool getSubdirProcess() const;
+		bool getEmptydirRebuild() const;
+		path getErrorPath() const;
+		bool getErrorBackup() const;
 	};
 	
 	// FileConfig
-	bool FileConfig::setInputPath(const path& pathIn) { // you actually can put an ellegal path here, it doesn't matter
-		inputPath = pathIn;
-		return !(exists(pathIn) && is_regular_file(pathIn));
+	bool FileConfig::setInputPath(const path& inputPath) { // you actually can put an ellegal path here, it doesn't matter
+		this->inputPath = inputPath;
+		return !(exists(inputPath) && is_regular_file(inputPath));
 	}
-	bool FileConfig::setOutputPath(const std::string& pathOut) {
-		outputPath = pathOut;
-		return exists(pathOut);
+	bool FileConfig::setOutputPath(const path& outputPath) {
+		this->outputPath = outputPath;
+		return exists(outputPath);
 	}
 	bool FileConfig::setModelInfo(const std::vector<std::string>& modelInfo) {
 		int modelType = getModelType_(modelInfo[0]); // here, modelType always belongto [1, 3]
@@ -81,8 +100,8 @@ namespace ImageSRBasic {
 			}
 		} return false;
 	}
-	path FileConfig::getInputPath() const { return inputPath; }
-	path FileConfig::getOutputPath() const { return outputPath; }
+	path FileConfig::getInputPath() 	const { return inputPath; }
+	path FileConfig::getOutputPath() 	const { return outputPath; }
 	std::vector<std::string> FileConfig::getModelInfo() const {
 		int modelType = getModelType();
 		std::vector<std::string> modelInfo;
@@ -103,12 +122,43 @@ namespace ImageSRBasic {
 	}
 	int FileConfig::getModelType() const { return getModelType_(model); }
 
-	// DirConfig
-//	bool FileConfig::setErrorPath(const std::string& path) {
-//		errorPath = ImageSRBasic::unquote(path);
-//		return false;
-//	}
-//	std::string FileConfig::getErrorPath() const { return errorPath; }
+	// Config
+	bool Config::setInputPath(const path& inputPath) {
+		this->inputPath = inputPath;
+		isFile = is_regular_file(inputPath); // isFile will be false if the file or folder does not exists.
+		return !exists(inputPath);
+	}
+	bool Config::setSelector(const std::string& selector) {
+		this->selector = selector;
+		return false;
+	}
+	bool Config::setTreeRestore(bool treeRestore) {
+		this->treeRestore = treeRestore;
+		return false;
+	}
+	bool Config::setSubdirProcess(bool subdirProcess) {
+		this->subdirProcess = subdirProcess;
+		return false;
+	}
+	bool Config::setEmptydirRebuild(bool emptydirRebuild) {
+		this->emptydirRebuild = emptydirRebuild;
+		return false;
+	}
+	bool Config::setErrorPath(const path& errorPath) {
+		this->errorPath = errorPath;
+		return false;
+	}
+	bool Config::setErrorBackup(bool errorBackup) {
+		this->errorBackup = errorBackup;
+		return false;
+	}
+	std::string Config::getSelector() 	const { return selector; }
+	bool Config::getTreeRestore() 		const { return treeRestore; }
+	bool Config::getSubdirProcess() 	const { return subdirProcess; }
+	bool Config::getEmptydirRebuild() 	const { return emptydirRebuild; }
+	path Config::getErrorPath() 		const { return errorPath; }
+	bool Config::getErrorBackup() 		const { return errorBackup; }
+	
 }
 
 #endif

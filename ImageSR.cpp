@@ -39,15 +39,18 @@ void FileConfig::processAsFile() const {
 		}
 	}
 	current_path(ROOTPATH);
-	cout << command << "\n";
+	cout << command << "\n"; // testout
 	ImageSRBasic::execute(command);
 }
 
 int main() {
-	FileConfig x;
-	x.setInputPath("input.jpg");
-	x.setOutputPath("output.jpg");
-	x.setModelInfo({"realesrgan-anime", "2"});
-	x.processAsFile();
+//	FileConfig x;
+//	cout << x.setInputPath("ImageTest\\input.jpg") << "\n";
+//	cout << x.setOutputPath("ImageTest\\output.jpg") << "\n";
+//	x.setModelInfo({"realesrgan-anime", "2"});
+//	x.processAsFile();
+	Config x;
+	cout << x.setInputPath("ImageTest") << "\n";
+	cout << x.isFile << "\n";
 	return 0;
 }
