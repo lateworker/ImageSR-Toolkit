@@ -1,3 +1,4 @@
+#define TEST
 #include <bits/stdc++.h>
 #include <windows.h>
 #include "include/basic.hpp"
@@ -6,11 +7,8 @@ int main() {
 //	cout << ImageSRBasic::FileConfig::getModelType("realesrgan-anime") << "\n";
 	using namespace std::filesystem;
 	path p("output\\out sdp");
+	p = weakly_canonical(p);
 	cout << p << "\n";
-	cout << p.string() << "\n";
-	cout << absolute(p) << "\n";
-	cout << exists(p) << "\n";
-	cout << is_regular_file(p) << "\n";
-	cout << is_directory(p) << "\n";
+	
 	return 0;
 }

@@ -45,7 +45,7 @@ namespace ImageSRBasic {
 	
 	class Config : public FileConfig {
 	protected:
-		bool isFile;
+		bool isFile, isDir;
 		std::string selector;
 		bool treeRestore, subdirProcess, emptydirRebuild;
 		path errorPath;
@@ -84,11 +84,11 @@ namespace ImageSRBasic {
 	
 	// FileConfig
 	bool FileConfig::setInputPath(const path& inputPath) { // you actually can put an ellegal path here, it doesn't matter
-		this->inputPath = inputPath;
+		this->inputPath = weakly_canonical(inputPath);
 		return !(exists(inputPath) && is_regular_file(inputPath));
 	}
 	bool FileConfig::setOutputPath(const path& outputPath) {
-		this->outputPath = outputPath;
+		this->outputPath = weakly_canonical(outputPath);
 		return exists(outputPath);
 	}
 	bool FileConfig::setModelInfo(const std::vector<std::string>& modelInfo) {
@@ -127,9 +127,10 @@ namespace ImageSRBasic {
 
 	// Config
 	bool Config::setInputPath(const path& inputPath) {
-		this->inputPath = inputPath;
+		this->inputPath = weakly_canonical(inputPath);
 		isFile = is_regular_file(inputPath); // isFile will be false if the file or folder does not exists.
-		return !exists(inputPath);
+		isDir = is_directory(inputPath);
+		return !(exists(inputPath) && (isFile || isDir));
 	}
 	bool Config::setSelector(const std::string& selector) {
 		this->selector = selector;
@@ -148,7 +149,7 @@ namespace ImageSRBasic {
 		return false;
 	}
 	bool Config::setErrorPath(const path& errorPath) {
-		this->errorPath = errorPath;
+		this->errorPath = weakly_canonical(errorPath);
 		return false;
 	}
 	bool Config::setErrorBackup(bool errorBackup) {
@@ -161,15 +162,6 @@ namespace ImageSRBasic {
 	bool Config::getEmptydirRebuild() 	const { return emptydirRebuild; }
 	path Config::getErrorPath() 		const { return errorPath; }
 	bool Config::getErrorBackup() 		const { return errorBackup; }
-	
-	
-	void Config::processAsDir() {
-		
-	}
-	void Config::process() {
-		if (isFile) processAsFile();
-		else processAsDir();
-	}
 }
 
 #endif
