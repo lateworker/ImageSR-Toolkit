@@ -44,13 +44,10 @@ void FileConfig::processAsFile() const {
 }
 
 int main() {
-//	FileConfig x;
-//	cout << x.setInputPath("ImageTest\\input.jpg") << "\n";
-//	cout << x.setOutputPath("ImageTest\\output.jpg") << "\n";
-//	x.setModelInfo({"realesrgan-anime", "2"});
-//	x.processAsFile();
 	Config x;
-	cout << x.setInputPath("ImageTest") << "\n";
-	cout << x.isFile << "\n";
+	cout << x.setInputPath("ImageTest\\input.jpg") << "\n";
+	cout << x.setOutputPath("ImageTest\\output.jpg") << "\n";
+	x.setModelInfo({"realesrgan-anime", "2"});
+	x.process();
 	return 0;
 }

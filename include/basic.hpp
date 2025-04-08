@@ -45,12 +45,12 @@ namespace ImageSRBasic {
 	
 	class Config : public FileConfig {
 	protected:
+		bool isFile;
 		std::string selector;
 		bool treeRestore, subdirProcess, emptydirRebuild;
 		path errorPath;
 		bool errorBackup;
 	public:
-		bool isFile;
 		Config() : FileConfig() {
 			inputPath = "input";
 			outputPath = "output";
@@ -77,6 +77,9 @@ namespace ImageSRBasic {
 		bool getEmptydirRebuild() const;
 		path getErrorPath() const;
 		bool getErrorBackup() const;
+		
+		void processAsDir();
+		void process();
 	};
 	
 	// FileConfig
@@ -159,6 +162,14 @@ namespace ImageSRBasic {
 	path Config::getErrorPath() 		const { return errorPath; }
 	bool Config::getErrorBackup() 		const { return errorBackup; }
 	
+	
+	void Config::processAsDir() {
+		
+	}
+	void Config::process() {
+		if (isFile) processAsFile();
+		else processAsDir();
+	}
 }
 
 #endif
