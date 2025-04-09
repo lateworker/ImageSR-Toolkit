@@ -45,39 +45,30 @@ namespace ImageSRBasic {
 	
 	class Config : public FileConfig {
 	protected:
-		bool isFile, isDir;
-		std::string selector;
-		bool treeRestore, subdirProcess, emptydirRebuild;
-		path errorPath;
-		bool errorBackup;
+		bool isFile, isDir, isForced;
+		std::vector<std::string> selector;
+		bool subdirProcess, emptydirRebuild; // maybe there's better name.
 	public:
 		Config() : FileConfig() {
 			inputPath = "input";
 			outputPath = "output";
 			isFile = false;
-			selector = "*";
-			treeRestore = true;
+			selector.clear();
 			subdirProcess = true;
 			emptydirRebuild = false;
-			errorPath = "";
-			errorBackup = true;
 		}
 		
 		bool setInputPath(const path& inputPath); // the function here is different from that in FileConfig, the logic of return is not the same, and there's more task should be finished here.
-		bool setSelector(const std::string& selector);
-		bool setTreeRestore(bool treeRestore);
+		bool setSelector(const std::vector<std::string>& selector);
 		bool setSubdirProcess(bool subdirProcess);
 		bool setEmptydirRebuild(bool emptydirRebuild);
-		bool setErrorPath(const path& pathError);
-		bool setErrorBackup(bool errorBackup);
+		void setForced(); void setUnforced();
 		
-		std::string getSelector() const;
-		bool getTreeRestore() const;
+		std::vector<std::string> getSelector() const;
 		bool getSubdirProcess() const;
 		bool getEmptydirRebuild() const;
-		path getErrorPath() const;
-		bool getErrorBackup() const;
 		
+		void rebuildDirStructure();
 		void processAsDir();
 		void process();
 	};
@@ -132,12 +123,8 @@ namespace ImageSRBasic {
 		isDir = is_directory(inputPath);
 		return !(exists(inputPath) && (isFile || isDir));
 	}
-	bool Config::setSelector(const std::string& selector) {
+	bool Config::setSelector(const std::vector<std::string>& selector) {
 		this->selector = selector;
-		return false;
-	}
-	bool Config::setTreeRestore(bool treeRestore) {
-		this->treeRestore = treeRestore;
 		return false;
 	}
 	bool Config::setSubdirProcess(bool subdirProcess) {
@@ -148,20 +135,11 @@ namespace ImageSRBasic {
 		this->emptydirRebuild = emptydirRebuild;
 		return false;
 	}
-	bool Config::setErrorPath(const path& errorPath) {
-		this->errorPath = weakly_canonical(errorPath);
-		return false;
-	}
-	bool Config::setErrorBackup(bool errorBackup) {
-		this->errorBackup = errorBackup;
-		return false;
-	}
-	std::string Config::getSelector() 	const { return selector; }
-	bool Config::getTreeRestore() 		const { return treeRestore; }
-	bool Config::getSubdirProcess() 	const { return subdirProcess; }
-	bool Config::getEmptydirRebuild() 	const { return emptydirRebuild; }
-	path Config::getErrorPath() 		const { return errorPath; }
-	bool Config::getErrorBackup() 		const { return errorBackup; }
+	void Config::setForced() { this->isForced = true; }
+	void Config::setUnforced() { this->isForced = false; }
+	std::vector<std::string> Config::getSelector()	const { return selector; }
+	bool Config::getSubdirProcess()		const { return subdirProcess; }
+	bool Config::getEmptydirRebuild()	const { return emptydirRebuild; }
 }
 
 #endif
