@@ -47,28 +47,24 @@ namespace ImageSRBasic {
 	protected:
 		bool isFile, isDir, isForced;
 		std::vector<std::string> selector;
-		bool subdirProcess, emptydirRebuild; // maybe there's better name.
+		bool recursive; // maybe there's better name.
+//		bool treeRestore, emptydirRebuild; these two are the function about filesystem, intending to code in a dll file. its not important now.
 	public:
 		Config() : FileConfig() {
 			inputPath = "input";
 			outputPath = "output";
 			isFile = false;
 			selector.clear();
-			subdirProcess = true;
-			emptydirRebuild = false;
+			recursive = true;
 		}
 		
 		bool setInputPath(const path& inputPath); // the function here is different from that in FileConfig, the logic of return is not the same, and there's more task should be finished here.
 		bool setSelector(const std::vector<std::string>& selector);
-		bool setSubdirProcess(bool subdirProcess);
-		bool setEmptydirRebuild(bool emptydirRebuild);
-		void setForced(); void setUnforced();
+		void setRecursive(); void unsetRecursive();
+		void setForced(); void unsetForced();
 		
-		std::vector<std::string> getSelector() const;
-		bool getSubdirProcess() const;
-		bool getEmptydirRebuild() const;
+		std::vector<std::string> getSelector() const; // is it really necessary to implement?
 		
-		void rebuildDirStructure();
 		void processAsDir();
 		void process();
 	};
@@ -127,19 +123,11 @@ namespace ImageSRBasic {
 		this->selector = selector;
 		return false;
 	}
-	bool Config::setSubdirProcess(bool subdirProcess) {
-		this->subdirProcess = subdirProcess;
-		return false;
-	}
-	bool Config::setEmptydirRebuild(bool emptydirRebuild) {
-		this->emptydirRebuild = emptydirRebuild;
-		return false;
-	}
-	void Config::setForced() { this->isForced = true; }
-	void Config::setUnforced() { this->isForced = false; }
+	void Config::setRecursive() 	{ this->recursive = true; }
+	void Config::unsetRecursive() 	{ this->recursive = false; }
+	void Config::setForced() 		{ this->isForced = true; }
+	void Config::unsetForced() 		{ this->isForced = false; }
 	std::vector<std::string> Config::getSelector()	const { return selector; }
-	bool Config::getSubdirProcess()		const { return subdirProcess; }
-	bool Config::getEmptydirRebuild()	const { return emptydirRebuild; }
 }
 
 #endif

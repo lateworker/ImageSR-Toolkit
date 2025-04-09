@@ -44,15 +44,13 @@ void FileConfig::processAsFile() const {
 	ImageSRBasic::execute(command);
 }
 void Config::processAsDir() {
-	// Test
 	cout << inputPath << "\n";
 	for (recursive_directory_iterator it = recursive_directory_iterator(inputPath); it != recursive_directory_iterator(); it++) {
-		path now = it->path();
-		if (now.filename() == ".git") {
-			cout << now << " Here\n";
-			it.disable_recursion_pending();
+		if (it->is_directory()) {
+			if (!recursive) it.disable_recursion_pending(); // if disabled recursion, break out when meeting a folder.
+			continue; // when meeting a folder, do nothing and continue.
 		}
-		else cout << now << "\n";
+		cout << it->path() << "\n";
 	}
 }
 void Config::process() {
@@ -62,9 +60,10 @@ void Config::process() {
 
 int main() {
 	Config x;
-	cout << x.setInputPath("ImageTest\\input.jpg") << "\n";
-	cout << x.setOutputPath("ImageTest\\sdf\\sdfaa\\utput.jpg") << "\n";
+	cout << x.setInputPath("C:\\OI") << "\n";
+	cout << x.setOutputPath("ImageTest\\sdf") << "\n";
 	x.setModelInfo({"realesrgan-anime", "2"});
+	x.unsetRecursive();
 	x.process();
 	return 0;
 }
