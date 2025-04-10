@@ -39,18 +39,19 @@ void FileConfig::processAsFile() const {
 			break;
 		}
 	}
-	current_path(ROOTPATH);
-	cout << command << "\n"; // testout
 	ImageSRBasic::execute(command);
 }
 void Config::processAsDir() {
-	cout << inputPath << "\n";
 	for (recursive_directory_iterator it = recursive_directory_iterator(inputPath); it != recursive_directory_iterator(); it++) {
 		if (it->is_directory()) {
 			if (!recursive) it.disable_recursion_pending(); // if disabled recursion, break out when meeting a folder.
 			continue; // when meeting a folder, do nothing and continue.
 		}
-		cout << it->path() << "\n";
+		FileConfig file;
+		file.setInputPath(it->path());
+		file.setOutputPath(this->outputPath / relative(it->path(), this->inputPath));
+		file.setModelInfo(this->getModelInfo());
+		file.processAsFile();
 	}
 }
 void Config::process() {
@@ -59,9 +60,10 @@ void Config::process() {
 }
 
 int main() {
+	system("chcp 65001 > nul"); // temp
 	Config x;
-	cout << x.setInputPath("C:\\OI") << "\n";
-	cout << x.setOutputPath("ImageTest\\sdf") << "\n";
+	cout << x.setInputPath("ImageTest\\In") << "\n";
+	cout << x.setOutputPath("ImageTest\\Out") << "\n";
 	x.setModelInfo({"realesrgan-anime", "2"});
 	x.unsetRecursive();
 	x.process();

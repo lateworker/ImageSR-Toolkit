@@ -17,7 +17,9 @@ namespace ImageSRBasic {
 		ss << s, ss >> std::quoted(s);
 		return s;
 	}
-	auto execute(std::string s) { return system(s.c_str()); }
+	void execute(std::string s) {
+		system(s.c_str()); // encode problem here!!!! I can't fix!!!!
+	}
 
 	class FileConfig {
 	protected:
