@@ -1,41 +1,42 @@
 #include <bits/stdc++.h>
 #include "include/basic.hpp"
+#include "include/CLI11.hpp"
 
 using namespace std;
 using namespace ImageSRBasic;
 
 filesystem::path FileConfig::ROOTPATH = filesystem::current_path();
 
-#define Waifu2x_Anime "models-upconv_7_anime_style_art_rgb"
-#define Waifu2x_Photo "models-upconv_7_photo"
+#define Waifu2x_Anime L"models-upconv_7_anime_style_art_rgb"
+#define Waifu2x_Photo L"models-upconv_7_photo"
 void FileConfig::processAsFile() const {
 	create_directories(outputPath.parent_path());
-	string command;
+	wstring command;
 	switch (getModelType()) {
 		case 1 : {
-			command = (ROOTPATH / "models" / "realesrgan.exe").string()
-			          + " -i " + ImageSRBasic::quote(inputPath.string())
-			          + " -o " + ImageSRBasic::quote(outputPath.string())
-			          + " -n " + ImageSRBasic::quote(model + "-x" + scale)
-			          + " -s " + scale;
+			command = (ROOTPATH / "models" / "realesrgan.exe").wstring()
+			          + L" -i " + ImageSRBasic::quote(inputPath.wstring())
+			          + L" -o " + ImageSRBasic::quote(outputPath.wstring())
+			          + L" -n " + ImageSRBasic::quote(model + L"-x" + scale)
+			          + L" -s " + scale;
 			break;
 		}
 		case 2 : {
-			command = (ROOTPATH / "models" / "waifu2x.exe").string()
-			          + " -i " + ImageSRBasic::quote(inputPath.string())
-			          + " -o " + ImageSRBasic::quote(outputPath.string())
-			          + " -m " + ImageSRBasic::quote(model == "waifu2x-anime" ? Waifu2x_Anime : Waifu2x_Photo)
-			          + " -s " + scale
-			          + " -n " + denoise;
+			command = (ROOTPATH / "models" / "waifu2x.exe").wstring()
+			          + L" -i " + ImageSRBasic::quote(inputPath.wstring())
+			          + L" -o " + ImageSRBasic::quote(outputPath.wstring())
+			          + L" -m " + ImageSRBasic::quote(model == L"waifu2x-anime" ? Waifu2x_Anime : Waifu2x_Photo)
+			          + L" -s " + scale
+			          + L" -n " + denoise;
 			break;
 		}
 		case 3 : {
-			command = (ROOTPATH / "models" / "realcugan.exe").string()
-			          + " -i " + ImageSRBasic::quote(inputPath.string())
-			          + " -o " + ImageSRBasic::quote(outputPath.string())
-			          + " -s " + scale
-			          + " -n " + denoise
-			          + " -c " + syncgap;
+			command = (ROOTPATH / "models" / "realcugan.exe").wstring()
+			          + L" -i " + ImageSRBasic::quote(inputPath.wstring())
+			          + L" -o " + ImageSRBasic::quote(outputPath.wstring())
+			          + L" -s " + scale
+			          + L" -n " + denoise
+			          + L" -c " + syncgap;
 			break;
 		}
 	}
@@ -59,13 +60,14 @@ void Config::process() {
 	if (isFile) processAsFile();
 }
 
-int main() {
-	system("chcp 65001 > nul"); // temp
-	Config x;
-	cout << x.setInputPath("ImageTest\\In") << "\n";
-	cout << x.setOutputPath("ImageTest\\Out") << "\n";
-	x.setModelInfo({"realesrgan-anime", "2"});
-	x.unsetRecursive();
-	x.process();
+Config target;
+
+int main(int argc, char* argv[]) {
+//	CLI::App argument("ImageSR-Tookit");
+//	argument.add_option("");
+	target.setInputPath(L"ImageTest\\In\\input.jpg");
+	target.setOutputPath(L"ImageTest\\Out\\output.jpg");
+	target.setModelInfo({L"realesrgan-anime", L"2"});
+	target.process();
 	return 0;
 }
