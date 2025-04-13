@@ -63,24 +63,22 @@ namespace ImageSRBasic {
 	class Config : public FileConfig {
 	protected:
 		bool isFile, isDir, isForced;
-		std::vector<std::wstring> selector;
+		std::set<std::wstring> selector;
 		bool recursive; // maybe there's better name.
 //		bool treeRestore, emptydirRebuild; these two are the function about filesystem, intending to code in a dll file. its not important now.
 	public:
 		Config() : FileConfig() {
-			inputPath = "input";
-			outputPath = "output";
 			isFile = false;
 			selector.clear();
 			recursive = true;
 		}
 		
 		bool setInputPath(const path& inputPath); // the function here is different from that in FileConfig, the logic of return is not the same, and there's more task should be finished here.
-		bool setSelector(const std::vector<std::wstring>& selector);
+		bool setSelector(const std::set<std::wstring>& selector);
 		void setRecursive(); void unsetRecursive();
 		void setForced(); void unsetForced();
 		
-		std::vector<std::wstring> getSelector() const; // is it really necessary to implement?
+		std::set<std::wstring> getSelector() const; // is it really necessary to implement?
 		
 		void processAsDir();
 		void process();
@@ -136,7 +134,7 @@ namespace ImageSRBasic {
 		isDir = is_directory(inputPath);
 		return !(exists(inputPath) && (isFile || isDir));
 	}
-	bool Config::setSelector(const std::vector<std::wstring>& selector) {
+	bool Config::setSelector(const std::set<std::wstring>& selector) {
 		this->selector = selector;
 		return false;
 	}
@@ -144,7 +142,7 @@ namespace ImageSRBasic {
 	void Config::unsetRecursive() 	{ this->recursive = false; }
 	void Config::setForced() 		{ this->isForced = true; }
 	void Config::unsetForced() 		{ this->isForced = false; }
-	std::vector<std::wstring> Config::getSelector()	const { return selector; }
+	std::set<std::wstring> Config::getSelector()	const { return selector; }
 }
 
 #endif

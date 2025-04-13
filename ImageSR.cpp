@@ -48,6 +48,7 @@ void Config::processAsDir() {
 			if (!recursive) it.disable_recursion_pending(); // if disabled recursion, break out when meeting a folder.
 			continue; // when meeting a folder, do nothing and continue.
 		}
+		if (!this->selector.empty() && !this->selector.count(it->path().extension().wstring())) continue;
 		FileConfig file;
 		file.setInputPath(it->path());
 		file.setOutputPath(this->outputPath / relative(it->path(), this->inputPath));
@@ -61,13 +62,47 @@ void Config::process() {
 }
 
 Config target;
+CLI::App app("ImageSR-Tookit");
+
+int parseCommandLine(int argc, char* argv[]) {
+	// inputPath
+	std::wstring inputPathStr;
+	app.add_option("-i,--input", inputPathStr, "Input Path")
+	->required()->check(CLI::ExistingPath);
+	// outputPath
+	std::wstring outputPathStr;
+	app.add_option("-o,--output", outputPathStr, "Output Path")
+	->required();
+//	// 模型参数
+//	std::vector<std::wstring> modelConfig;
+//	app.add_option("-m,--model", modelConfig, "Model configuration")
+//	->default_val<std::vector<std::wstring>>({});
+
+//	// 强制模式
+//	bool isForced = false;
+//	app.add_flag("--force", isForced, "Force processing");
+//
+//	// 选择器
+//	std::vector<std::wstring> selector;
+//	app.add_option("--selector", selector, "File selector");
+
+//	// 递归模式
+//	bool recursive = true;
+//	app.add_flag("--recursive", recursive, "Recursive processing");
+//	app.add_flag("--no-recursive", recursive, "Non-recursive processing");
+
+	// 解析命令行参数
+	CLI11_PARSE(app, argc, argv);
+
+	// 设置Config对象
+	target.setInputPath(inputPathStr);
+	target.setOutputPath(outputPathStr);
+	return 0;
+}
 
 int main(int argc, char* argv[]) {
-//	CLI::App argument("ImageSR-Tookit");
-//	argument.add_option("");
-	target.setInputPath(L"ImageTest\\In\\input.jpg");
-	target.setOutputPath(L"ImageTest\\Out\\output.jpg");
-	target.setModelInfo({L"realesrgan-anime", L"2"});
+	argv = app.ensure_utf8(argv);
+	parseCommandLine(argc, argv);
 	target.process();
 	return 0;
 }
