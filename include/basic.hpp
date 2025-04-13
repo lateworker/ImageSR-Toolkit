@@ -36,54 +36,64 @@ namespace ImageSRBasic {
 		return false;
 	}
 
+#define REALESR 1
+#define WAIFU2X 2
+#define REALCUGAN 3
 	class FileConfig {
 	protected:
 		path inputPath, outputPath; // these paths are all unquoted
-		std::wstring model, scale, denoise, syncgap; // not each model has all these parameters
-		static path ROOTPATH;
+		bool isForced; // whether force overwriting the existing file.
+		struct Realesr { std::wstring model, scale; };
+		struct Waifu2x { std::wstring model, scale, denoise; };
+		struct Realcugan { std::wstring model, scale, denoise, syncgap; };
+		std::variant<std::monostate, Realesr, Waifu2x, Realcugan> coreConfig;
 	public:
+		using CoreConfig_t = std::variant<std::monostate, Realesr, Waifu2x, Realcugan>;
+		static path ROOTPATH;
 		FileConfig() {
 			inputPath = outputPath = path();
-			model = scale = denoise = syncgap = std::wstring();
+			coreConfig.emplace<0>();
 		}
 
 		bool setInputPath(const path& inputPath);
 		bool setOutputPath(const path& outputPath);
-		bool setModelInfo(const std::vector<std::wstring>& modelConfig);
+		void setForced(); void unsetForced();
+		bool setCoreModel(const std::wstring& model, bool overwrite);
+		bool setCoreScale(const std::wstring& scale);
+		bool setCoreDenoise(const std::wstring& denoise);
+		bool setCoreSyncgap(const std::wstring& syncgap);
+		bool setCoreConfig(const CoreConfig_t& coreConfig);
 
 		path getInputPath() const;
 		path getOutputPath() const;
-		std::vector<std::wstring> getModelInfo() const;
-		static int getModelType_(const std::wstring& model_);
-		int getModelType() const; // the result represents the parameters' number of the model
+		int getCoreType() const; // the result represents the parameters' number of the model
+		CoreConfig_t getCoreConfig() const;
+		static int getCoreType(const std::wstring& model);
 
 		void processAsFile() const;
 	};
-	
+
 	class Config : public FileConfig {
 	protected:
-		bool isFile, isDir, isForced;
+		bool isFile, isDir, isRecursive; // maybe there's better name.
 		std::set<std::wstring> selector;
-		bool recursive; // maybe there's better name.
 //		bool treeRestore, emptydirRebuild; these two are the function about filesystem, intending to code in a dll file. its not important now.
 	public:
 		Config() : FileConfig() {
-			isFile = false;
+			isRecursive = true;
 			selector.clear();
-			recursive = true;
 		}
-		
+
 		bool setInputPath(const path& inputPath); // the function here is different from that in FileConfig, the logic of return is not the same, and there's more task should be finished here.
 		bool setSelector(const std::set<std::wstring>& selector);
 		void setRecursive(); void unsetRecursive();
-		void setForced(); void unsetForced();
-		
+
 		std::set<std::wstring> getSelector() const; // is it really necessary to implement?
-		
-		void processAsDir();
-		void process();
+
+		void processAsDir() const;
+		void process() const;
 	};
-	
+
 	// FileConfig
 	bool FileConfig::setInputPath(const path& inputPath) { // you actually can put an ellegal path here, it doesn't matter
 		this->inputPath = weakly_canonical(inputPath);
@@ -93,39 +103,53 @@ namespace ImageSRBasic {
 		this->outputPath = weakly_canonical(outputPath);
 		return exists(outputPath);
 	}
-	bool FileConfig::setModelInfo(const std::vector<std::wstring>& modelInfo) {
-		int modelType = getModelType_(modelInfo[0]); // here, modelType always belongto [1, 3]
-		if (int(modelInfo.size()) - 1 != modelType) return true; // the procession is all controlled by the model
-		model = modelInfo[0];
-		for (int i = 1; i <= modelType; i++) {
-			switch (i) {
-				case 1 : scale = modelInfo[i]; break;
-				case 2 : denoise = modelInfo[i]; break;
-				case 3 : syncgap = modelInfo[i]; break;
-			}
+	void FileConfig::setForced() 		{ this->isForced = true; }
+	void FileConfig::unsetForced() 		{ this->isForced = false; }
+	bool FileConfig::setCoreModel(const std::wstring& model, bool overwrite = false) {
+		if (!overwrite && this->getCoreType() != 0) return true;
+		switch (getCoreType(model)) {
+			case REALESR: 	this->coreConfig.emplace<REALESR>(model); break;
+			case WAIFU2X: 	this->coreConfig.emplace<WAIFU2X>(model); break;
+			case REALCUGAN: this->coreConfig.emplace<REALCUGAN>(model); break;
+			case 0: this->coreConfig.emplace<0>(); break;
+			default: return true;
 		} return false;
+	}
+	bool FileConfig::setCoreScale(const std::wstring& scale) {
+		switch (this->getCoreType()) {
+			case REALESR: 	get<REALESR>(this->coreConfig).scale = scale; break;
+			case WAIFU2X: 	get<WAIFU2X>(this->coreConfig).scale = scale; break;
+			case REALCUGAN: get<REALCUGAN>(this->coreConfig).scale = scale; break;
+			default: return true;
+		} return false;
+	}
+	bool FileConfig::setCoreDenoise(const std::wstring& denoise) {
+		switch (this->getCoreType()) {
+			case WAIFU2X: 	get<WAIFU2X>(this->coreConfig).denoise = denoise; break;
+			case REALCUGAN: get<REALCUGAN>(this->coreConfig).denoise = denoise; break;
+			default: return true;
+		} return false;
+	}
+	bool FileConfig::setCoreSyncgap(const std::wstring& syncgap) {
+		switch (this->getCoreType()) {
+			case REALCUGAN: get<REALCUGAN>(this->coreConfig).syncgap = syncgap; break;
+			default: return true;
+		} return false;
+	}
+	bool FileConfig::setCoreConfig(const FileConfig::CoreConfig_t& coreConfig) {
+		this->coreConfig = coreConfig;
+		return coreConfig.index() == 0;
 	}
 	path FileConfig::getInputPath() 	const { return inputPath; }
 	path FileConfig::getOutputPath() 	const { return outputPath; }
-	std::vector<std::wstring> FileConfig::getModelInfo() const {
-		int modelType = getModelType();
-		std::vector<std::wstring> modelInfo;
-		modelInfo.push_back(model);
-		for (int i = 1; i <= modelType; i++) {
-			switch (i) {
-				case 1 : modelInfo.push_back(scale); break;
-				case 2 : modelInfo.push_back(denoise); break;
-				case 3 : modelInfo.push_back(syncgap); break;
-			}
-		} return modelInfo;
-	}
-	int FileConfig::getModelType_(const std::wstring& model_) {
-		if (model_ == L"realesrgan" || model_ == L"realesrnet" || model_ == L"realesrgan-anime" || model_ == L"DF2K" || model_ == L"DF2K-JPEG") return 1;
-		if (model_ == L"waifu2x-anime" || model_ == L"waifu2x-photo") return 2;
-		if (model_ == L"realcugan") return 3;
+	int FileConfig::getCoreType() const { return coreConfig.index(); }
+	FileConfig::CoreConfig_t FileConfig::getCoreConfig() const { return coreConfig; }
+	int FileConfig::getCoreType(const std::wstring& model) {
+		if (model == L"realesrgan" || model == L"realesrnet" || model == L"realesrgan-anime" || model == L"DF2K" || model == L"DF2K-JPEG") return REALESR;
+		if (model == L"waifu2x-anime" || model == L"waifu2x-photo") return WAIFU2X;
+		if (model == L"realcugan") return REALCUGAN;
 		return 0;
 	}
-	int FileConfig::getModelType() const { return getModelType_(model); }
 
 	// Config
 	bool Config::setInputPath(const path& inputPath) {
@@ -138,10 +162,8 @@ namespace ImageSRBasic {
 		this->selector = selector;
 		return false;
 	}
-	void Config::setRecursive() 	{ this->recursive = true; }
-	void Config::unsetRecursive() 	{ this->recursive = false; }
-	void Config::setForced() 		{ this->isForced = true; }
-	void Config::unsetForced() 		{ this->isForced = false; }
+	void Config::setRecursive() 	{ this->isRecursive = true; }
+	void Config::unsetRecursive() 	{ this->isRecursive = false; }
 	std::set<std::wstring> Config::getSelector()	const { return selector; }
 }
 

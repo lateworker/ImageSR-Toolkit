@@ -1,15 +1,40 @@
 #include <bits/stdc++.h>
 #include <windows.h>
-#include "include/basic.hpp"
-#include "include/CLI11.hpp"
+//#include "include/basic.hpp"
+//#include "include/CLI11.hpp"
 using namespace std;
 wstring proexe = L"D:\\CProjects\\ImageSR-Toolkit\\models\\realesrgan.exe";
 wstring proarg = L"-i \"D:\\\\CProjects\\\\ImageSR-Toolkit\\\\中文测试\\\\输入.jpg\" -o \"D:\\\\CProjects\\\\ImageSR-Toolkit\\\\ImageTest\\\\输出\\\\output.jpg\" -n \"realesrgan-anime-x2\" -s 2";
 void outWstring(const wstring& str) { WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str.c_str(), str.size(), NULL, NULL); }
 
-int main(int argc, char* argv[]) {
-//int main() {
+class TR {
+public:
+	
+	enum struct ModelType { Null, Realesr, Waifu2x, Realcugan } modelType;
+	struct Realesr { std::wstring model, scale; };
+	struct Waifu2x { std::wstring model, scale, denoise; };
+	struct Realcugan { std::wstring model, scale, denoise, syncgap; };
+	std::variant<std::monostate, Realesr, Waifu2x, Realcugan> modelConfig;
+
+	TR() {
+
+	}
+};
+
+//int main(int argc, char* argv[]) {
+int main() {
 	system("chcp 65001 > nul");
+
+	TR t;
+	t.modelConfig.emplace<1>(L"Test");
+	cout << t.modelConfig.index() << " ";
+	outWstring(get<1>(t.modelConfig).model);
+	t.modelConfig.emplace<2>(L"t2");
+	
+//	t.modelType = TR::REALESR;
+//	t.modelConfig = {"realesrgan-anime", "2"};
+
+
 //	CLI::App app{"This is a test application."};
 //	argv = app.ensure_utf8(argv);
 //
@@ -35,9 +60,9 @@ int main(int argc, char* argv[]) {
 //		WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str.c_str(), str.size(), NULL, NULL);
 //		cout << "\n";
 //	}
-	
+
 //	ImageSRBasic::execute(proexe + L" " + proarg);
-	ImageSRBasic::execute(L"t.exe");
-	
+//	ImageSRBasic::execute(L"t.exe");
+
 	return 0;
 }
