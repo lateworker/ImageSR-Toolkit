@@ -77,13 +77,23 @@ CLI::App app("ImageSR-Tookit");
 int parseCommandLine(int argc, char* argv[]) {
 	// inputPath
 	std::wstring inputPathStr;
-	app.add_option("-i,--input", inputPathStr, "Input path, an existing file or directory")
-	->required()->check(CLI::ExistingPath);
+	app.add_option("-i,--input", inputPathStr, "Input path, an existing file or directory") -> required() -> check(CLI::ExistingPath);
 	// outputPath
 	std::wstring outputPathStr;
-	app.add_option("-o,--output", outputPathStr, "Output path, the same pathtype as input path")
-	->required();
-	// modelConfig
+	app.add_option("-o,--output", outputPathStr, "Output path, the same pathtype as input path") -> required();
+	// coreModel
+	std::wstring coreModel;
+	app.add_option("-m,--model", coreModel, "Core model") -> required();
+	// coreScale
+	int coreScale;
+	app.add_option("-s,--scale", coreScale, "Core scale");
+	// coreDenoise
+	int coreDenoise;
+	app.add_option("-d,--denoise", coreDenoise, "Core denoise");
+	// coreSyncgap
+	int coreSyncgap;
+	app.add_option("-g,--syncgap", coreSyncgap, "Core syncgap");
+	
 //	std::vector<std::wstring> modelConfig;
 //	wstring model,
 //	        app.add_option("-m,--model",, "Model configuration")
@@ -105,18 +115,17 @@ int parseCommandLine(int argc, char* argv[]) {
 	// apply to the target
 	target.setInputPath(inputPathStr);
 	target.setOutputPath(outputPathStr);
+	target.setCoreModel(coreModel);
+	target.setCoreScale(to_wstring(coreScale));
+	target.setCoreDenoise(to_wstring(coreDenoise));
+	target.setCoreSyncgap(to_wstring(coreSyncgap));
 	return 0;
 }
 
 int main(int argc, char* argv[]) {
 	system("chcp 65001 > nul");
-//	argv = app.ensure_utf8(argv);
-//	parseCommandLine(argc, argv);
-	target.setInputPath(L"ImageTest\\输入文件夹");
-	target.setOutputPath(L"ImageTest\\输出文件夹");
-	target.setCoreModel(L"realesrgan-anime");
-	target.setCoreScale(L"2");
-//	target.unsetRecursive();
+	argv = app.ensure_utf8(argv);
+	parseCommandLine(argc, argv);
 	target.process();
 	return 0;
 }
