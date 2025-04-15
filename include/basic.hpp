@@ -36,9 +36,6 @@ namespace ImageSRBasic {
 		return false;
 	}
 
-#define REALESR 1
-#define WAIFU2X 2
-#define REALCUGAN 3
 	class FileConfig {
 	protected:
 		path inputPath, outputPath; // these paths are all unquoted
@@ -48,6 +45,7 @@ namespace ImageSRBasic {
 		struct Realcugan { std::wstring model, scale, denoise, syncgap; };
 		std::variant<std::monostate, Realesr, Waifu2x, Realcugan> coreConfig;
 	public:
+		enum { REALESR = 1, WAIFU2X = 2, REALCUGAN = 3 };
 		using CoreConfig_t = std::variant<std::monostate, Realesr, Waifu2x, Realcugan>;
 		static path ROOTPATH;
 		FileConfig() {
@@ -76,19 +74,19 @@ namespace ImageSRBasic {
 	class Config : public FileConfig {
 	protected:
 		bool isFile, isDir, isRecursive; // maybe there's better name.
-		std::set<std::wstring> selector;
+		std::set<std::wstring> extSelector;
 //		bool treeRestore, emptydirRebuild; these two are the function about filesystem, intending to code in a dll file. its not important now.
 	public:
 		Config() : FileConfig() {
 			isRecursive = true;
-			selector.clear();
+			extSelector.clear();
 		}
 
 		bool setInputPath(const path& inputPath); // the function here is different from that in FileConfig, the logic of return is not the same, and there's more task should be finished here.
-		bool setSelector(const std::set<std::wstring>& selector);
+		bool setExtSelector(const std::set<std::wstring>& extSelector);
 		void setRecursive(); void unsetRecursive();
 
-		std::set<std::wstring> getSelector() const; // is it really necessary to implement?
+		std::set<std::wstring> getExtSelector() const; // is it really necessary to implement?
 
 		void processAsDir() const;
 		void process() const;
@@ -158,13 +156,13 @@ namespace ImageSRBasic {
 		isDir = is_directory(inputPath);
 		return !(exists(inputPath) && (isFile || isDir));
 	}
-	bool Config::setSelector(const std::set<std::wstring>& selector) {
-		this->selector = selector;
+	bool Config::setExtSelector(const std::set<std::wstring>& extSelector) {
+		this->extSelector = extSelector;
 		return false;
 	}
 	void Config::setRecursive() 	{ this->isRecursive = true; }
 	void Config::unsetRecursive() 	{ this->isRecursive = false; }
-	std::set<std::wstring> Config::getSelector()	const { return selector; }
+	std::set<std::wstring> Config::getExtSelector()	const { return extSelector; }
 }
 
 #endif

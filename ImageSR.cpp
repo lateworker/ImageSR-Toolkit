@@ -57,7 +57,7 @@ void Config::processAsDir() const {
 			continue; // when meeting a folder, do nothing and continue.
 		}
 		// check selector
-		if (!selector.empty() && !selector.count(it->path().extension().wstring())) continue;
+		if (!extSelector.empty() && !extSelector.count(it->path().extension().wstring())) continue;
 
 		FileConfig file;
 		file.setInputPath(it->path());
@@ -81,6 +81,7 @@ int parseCommandLine(int argc, char* argv[]) {
 	// outputPath
 	std::wstring outputPathStr;
 	app.add_option("-o,--output", outputPathStr, "Output path, the same pathtype as input path") -> required();
+	
 	// coreModel
 	std::wstring coreModel;
 	app.add_option("-m,--model", coreModel, "Core model") -> required();
@@ -94,21 +95,18 @@ int parseCommandLine(int argc, char* argv[]) {
 	int coreSyncgap;
 	app.add_option("-g,--syncgap", coreSyncgap, "Core syncgap");
 	
-//	std::vector<std::wstring> modelConfig;
-//	wstring model,
-//	        app.add_option("-m,--model",, "Model configuration")
-//	        // isForced
-//	        bool isForced = false;
-//	app.add_flag("-f,--force", isForced, "Whether overwriting output path in force");
-//
-//	// 选择器
-//	std::vector<std::wstring> selector;
-//	app.add_option("--selector", selector, "File selector");
-
-//	// 递归模式
-//	bool recursive = true;
-//	app.add_flag("--recursive", recursive, "Recursive processing");
-//	app.add_flag("--no-recursive", recursive, "Non-recursive processing");
+	// extSelector
+	vector<wstring> extSelectorData;
+	app.add_option("-e,--extension", extSelectorData, "Extension (something like 'jpg') selector, be empty to process everything");
+	set<wstring> extSelector;
+	for (const wstring& x : extSelectorData) extSelector.insert(L"." + x);
+	
+	// isForced
+	bool isForced = false;
+	app.add_flag("-f,--force", isForced, "Overwrite output path in force") -> default_val("false");
+	// isRecursive
+	bool isRecursive = true;
+	app.add_flag("-r,--recurse", isRecursive, "Go into the subdir to process") -> default_val("true");
 
 	CLI11_PARSE(app, argc, argv);
 
@@ -119,6 +117,9 @@ int parseCommandLine(int argc, char* argv[]) {
 	target.setCoreScale(to_wstring(coreScale));
 	target.setCoreDenoise(to_wstring(coreDenoise));
 	target.setCoreSyncgap(to_wstring(coreSyncgap));
+	target.setExtSelector(extSelector);
+	if (isForced) target.setForced(); else target.unsetForced();
+	if (isRecursive) target.setRecursive(); else target.unsetRecursive();
 	return 0;
 }
 
