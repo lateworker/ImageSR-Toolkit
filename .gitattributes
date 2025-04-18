@@ -1,0 +1,4 @@
+ffmpeg/** filter=lfs diff=lfs merge=lfs -text
+ImageTest/** filter=lfs diff=lfs merge=lfs -text
+VideoTest/** filter=lfs diff=lfs merge=lfs -text
+models/** filter=lfs diff=lfs merge=lfs -text
