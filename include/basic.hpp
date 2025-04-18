@@ -9,6 +9,7 @@ namespace ImageSRBasic {
 	using namespace std::filesystem;
 
 	// Basic
+	const size_t BufferSize = 4096;
 	std::wstring quote(std::wstring s) {
 		std::wstringstream ss;
 		ss << std::quoted(s);
@@ -25,15 +26,17 @@ namespace ImageSRBasic {
 	std::wstring widen(const std::string& s) {
 		return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> >().from_bytes(s);
 	}
-	bool execute(std::wstring cmd) {
-		FILE* fp;
-		fp = _wpopen(cmd.c_str(), L"r");
-		if (!fp) return true;
-		char MsgBuff[4096]; // using wchar_t here will cause encode problem instead.
-		memset(MsgBuff, 0, sizeof MsgBuff);
-		while (fgets(MsgBuff, sizeof MsgBuff, fp)) std::cout << MsgBuff;
+	std::wstring execute(const std::wstring& cmd) {
+		FILE* fp = _wpopen(cmd.c_str(), L"r");
+		if (!fp) {
+			// throw error
+		}
+		std::string echoResult;
+		char MsgBuff[BufferSize]; // using wchar_t here will cause encode problem instead.
+//		memset(MsgBuff, 0, sizeof MsgBuff); I think it's useless.
+		while (fgets(MsgBuff, sizeof MsgBuff, fp)) echoResult += MsgBuff;
 		_pclose(fp);
-		return false;
+		return widen(echoResult);
 	}
 
 	class FileConfig {

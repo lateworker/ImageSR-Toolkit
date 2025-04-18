@@ -6,63 +6,27 @@ using namespace std;
 wstring proexe = L"D:\\CProjects\\ImageSR-Toolkit\\models\\realesrgan.exe";
 wstring proarg = L"-i \"D:\\\\CProjects\\\\ImageSR-Toolkit\\\\中文测试\\\\输入.jpg\" -o \"D:\\\\CProjects\\\\ImageSR-Toolkit\\\\ImageTest\\\\输出\\\\output.jpg\" -n \"realesrgan-anime-x2\" -s 2";
 void outWstring(const wstring& str) { WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str.c_str(), str.size(), NULL, NULL); }
+std::string narrow(const std::wstring& s) {
+	return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> >().to_bytes(s);
+}
+std::wstring widen(const std::string& s) {
+	return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> >().from_bytes(s);
+}
+wstring execute(const std::wstring& cmd) {
+	FILE* fp;
+	fp = _wpopen(cmd.c_str(), L"r");
+	string res;
+	char MsgBuff[4096];
+	memset(MsgBuff, 0, sizeof MsgBuff);
+	while (fgets(MsgBuff, sizeof MsgBuff, fp)) res += MsgBuff;
+	_pclose(fp);
+	return widen(res);
+}
 
-class TR {
-public:
-	
-	enum struct ModelType { Null, Realesr, Waifu2x, Realcugan } modelType;
-	struct Realesr { std::wstring model, scale; };
-	struct Waifu2x { std::wstring model, scale, denoise; };
-	struct Realcugan { std::wstring model, scale, denoise, syncgap; };
-	std::variant<std::monostate, Realesr, Waifu2x, Realcugan> modelConfig;
-
-	TR() {
-
-	}
-};
-
-//int main(int argc, char* argv[]) {
 int main() {
 	system("chcp 65001 > nul");
-
-	TR t;
-	t.modelConfig.emplace<1>(L"Test");
-	cout << t.modelConfig.index() << " ";
-	outWstring(get<1>(t.modelConfig).model);
-	t.modelConfig.emplace<2>(L"t2");
 	
-//	t.modelType = TR::REALESR;
-//	t.modelConfig = {"realesrgan-anime", "2"};
-
-
-//	CLI::App app{"This is a test application."};
-//	argv = app.ensure_utf8(argv);
-//
-//	std::wstring str;
-//	int age;
-//
-//	app.add_option("-n,--name", str, "Your name")->required();
-//	app.add_option("-a,--age", age, "Your age")->required();
-//
-//	CLI11_PARSE(app, argc, argv);
-//
-////	WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str.c_str(), str.size(), NULL, NULL);
-//	cout << ImageSRBasic::narrow(str);
-//	cout << "\n" << age << "\n";
-//	cout << ImageSRBasic::FileConfig::getModelType("realesrgan-anime") << "\n";
-//	using namespace std::filesystem;
-//	wstring s = L"中文测试";
-//	path p = s;
-//	cout << is_directory(p) << "\n";
-//	for (directory_iterator it = directory_iterator(p); it != directory_iterator(); it++) {
-////		cout << it->path() << "\n";
-//		wstring str = it->path().wstring();
-//		WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str.c_str(), str.size(), NULL, NULL);
-//		cout << "\n";
-//	}
-
-//	ImageSRBasic::execute(proexe + L" " + proarg);
-//	ImageSRBasic::execute(L"t.exe");
+	cout << narrow(execute(L"中文\\测试.exe"));
 
 	return 0;
 }

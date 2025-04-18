@@ -46,9 +46,9 @@ void FileConfig::processAsFile() const {
 			          + L" -c " + syncgap;
 			break;
 		}
-		default: return;
+		default: return; // throw the model error
 	}
-	ImageSRBasic::execute(command);
+	cout << narrow(ImageSRBasic::execute(command));
 }
 void Config::processAsDir() const {
 	for (recursive_directory_iterator it = recursive_directory_iterator(inputPath); it != recursive_directory_iterator(); it++) {
