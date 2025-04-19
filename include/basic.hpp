@@ -94,6 +94,11 @@ namespace ImageSRBasic {
 		void processAsDir() const;
 		void process() const;
 	};
+	
+	class VideoMan { // VideoManager
+	protected:
+		path inputPath; // OnlyPath ?
+	};
 
 	// FileConfig
 	bool FileConfig::setInputPath(const path& inputPath) { // you actually can put an ellegal path here, it doesn't matter
