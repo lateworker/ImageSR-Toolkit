@@ -102,11 +102,12 @@ namespace ImageSRBasic {
 
 	// FileConfig
 	bool FileConfig::setInputPath(const path& inputPath) { // you actually can put an ellegal path here, it doesn't matter
-		this->inputPath = weakly_canonical(inputPath);
-		return !(exists(inputPath) && is_regular_file(inputPath));
+		if (!exists(inputPath)) return true;
+		this->inputPath = canonical(inputPath); // use canonical because the path defenitely exists
+		return !is_regular_file(inputPath);
 	}
 	bool FileConfig::setOutputPath(const path& outputPath) {
-		this->outputPath = weakly_canonical(outputPath);
+		this->outputPath = weakly_canonical(absolute(outputPath));
 		return exists(outputPath);
 	}
 	void FileConfig::setForced() 		{ this->isForced = true; }
@@ -159,10 +160,11 @@ namespace ImageSRBasic {
 
 	// Config
 	bool Config::setInputPath(const path& inputPath) {
-		this->inputPath = weakly_canonical(inputPath);
+		if (!exists(inputPath)) return false;
+		this->inputPath = canonical(inputPath);
 		isFile = is_regular_file(inputPath); // isFile will be false if the file or folder does not exists.
 		isDir = is_directory(inputPath);
-		return !(exists(inputPath) && (isFile || isDir));
+		return !(isFile || isDir);
 	}
 	bool Config::setExtSelector(const std::set<std::wstring>& extSelector) {
 		this->extSelector = extSelector;

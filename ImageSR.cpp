@@ -14,7 +14,7 @@ void FileConfig::processAsFile() const {
 		// give an option later.
 		return;
 	}
-	create_directories(outputPath.parent_path());
+	if (!exists(outputPath.parent_path())) create_directories(outputPath.parent_path());
 	wstring command;
 	switch (getCoreType()) {
 		case REALESR: {
