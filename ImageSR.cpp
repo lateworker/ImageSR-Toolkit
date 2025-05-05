@@ -5,13 +5,15 @@
 using namespace std;
 using namespace ImageSRBasic;
 
-filesystem::path FileConfig::ROOTPATH = filesystem::current_path();
+filesystem::path FileConfig::ROOTPATH = filesystem::current_path(); // some problem here!!!
 
 #define Waifu2x_Anime L"models-upconv_7_anime_style_art_rgb"
 #define Waifu2x_Photo L"models-upconv_7_photo"
 void FileConfig::processAsFile() const {
 	if (exists(outputPath) && !isForced) {
 		// give an option later.
+		cout << "Error: output file " << narrow(outputPath.wstring()) << " has already existed.\n";
+		cout << "Please using --force option or clean up the file manually.\n";
 		return;
 	}
 	if (!exists(outputPath.parent_path())) create_directories(outputPath.parent_path());
@@ -48,6 +50,7 @@ void FileConfig::processAsFile() const {
 		}
 		default: return; // throw the model error
 	}
+	cout << narrow(command) << "\n";
 	cout << narrow(ImageSRBasic::execute(command));
 }
 void Config::processAsDir() const {
