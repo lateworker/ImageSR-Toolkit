@@ -38,6 +38,11 @@ namespace ImageSRBasic {
 		_pclose(fp);
 		return widen(echoResult);
 	}
+	std::filesystem::path getExecPath() {
+		wchar_t PathBuff[BufferSize];
+		GetModuleFileNameW(NULL, PathBuff, BufferSize);
+		return path(PathBuff);
+	}
 
 	class FileConfig {
 	protected:

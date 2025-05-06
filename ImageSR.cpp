@@ -5,7 +5,8 @@
 using namespace std;
 using namespace ImageSRBasic;
 
-filesystem::path FileConfig::ROOTPATH = filesystem::current_path(); // some problem here!!!
+// rootpath: root of the project.
+filesystem::path FileConfig::ROOTPATH = getExecPath().parent_path(); // some problem here!!!
 
 #define Waifu2x_Anime L"models-upconv_7_anime_style_art_rgb"
 #define Waifu2x_Photo L"models-upconv_7_photo"
@@ -22,18 +23,18 @@ void FileConfig::processAsFile() const {
 		case REALESR: {
 			const auto& [model, scale] = get<REALESR>(coreConfig);
 			command = (ROOTPATH / "models" / "realesrgan.exe").wstring()
-			          + L" -i " + ImageSRBasic::quote(inputPath.wstring())
-			          + L" -o " + ImageSRBasic::quote(outputPath.wstring())
-			          + L" -n " + ImageSRBasic::quote(model + L"-x" + scale)
+			          + L" -i " + quote(inputPath.wstring())
+			          + L" -o " + quote(outputPath.wstring())
+			          + L" -n " + quote(model + L"-x" + scale)
 			          + L" -s " + scale;
 			break;
 		}
 		case WAIFU2X: {
 			const auto& [model, scale, denoise] = get<WAIFU2X>(coreConfig);
 			command = (ROOTPATH / "models" / "waifu2x.exe").wstring()
-			          + L" -i " + ImageSRBasic::quote(inputPath.wstring())
-			          + L" -o " + ImageSRBasic::quote(outputPath.wstring())
-			          + L" -m " + ImageSRBasic::quote(model == L"waifu2x-anime" ? Waifu2x_Anime : Waifu2x_Photo)
+			          + L" -i " + quote(inputPath.wstring())
+			          + L" -o " + quote(outputPath.wstring())
+			          + L" -m " + quote(model == L"waifu2x-anime" ? Waifu2x_Anime : Waifu2x_Photo)
 			          + L" -s " + scale
 			          + L" -n " + denoise;
 			break;
@@ -41,8 +42,8 @@ void FileConfig::processAsFile() const {
 		case REALCUGAN: {
 			const auto& [model, scale, denoise, syncgap] = get<REALCUGAN>(coreConfig);
 			command = (ROOTPATH / "models" / "realcugan.exe").wstring()
-			          + L" -i " + ImageSRBasic::quote(inputPath.wstring())
-			          + L" -o " + ImageSRBasic::quote(outputPath.wstring())
+			          + L" -i " + quote(inputPath.wstring())
+			          + L" -o " + quote(outputPath.wstring())
 			          + L" -s " + scale
 			          + L" -n " + denoise
 			          + L" -c " + syncgap;
@@ -51,7 +52,7 @@ void FileConfig::processAsFile() const {
 		default: return; // throw the model error
 	}
 	cout << narrow(command) << "\n";
-	cout << narrow(ImageSRBasic::execute(command));
+	cout << narrow(execute(command));
 }
 void Config::processAsDir() const {
 	for (recursive_directory_iterator it = recursive_directory_iterator(inputPath); it != recursive_directory_iterator(); it++) {
