@@ -1,2 +1,5 @@
 include/** export-ignore
+include export-ignore
 ImageSR.cpp export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
