@@ -43,6 +43,16 @@ namespace ImageSRBasic {
 		GetModuleFileNameW(NULL, PathBuff, BufferSize);
 		return path(PathBuff);
 	}
+	std::string getRandomString(size_t length) { // unnecessary to use wstring.
+		const static std::string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		std::random_device randomDevice;
+		std::mt19937 generator(randomDevice());
+		std::uniform_int_distribution<> distribution(0, characters.size() - 1);
+		std::string result;
+		for (size_t i = 0; i < length; ++i)
+			result += characters[distribution(generator)];
+		return result;
+	}
 
 	class FileConfig {
 	protected:
@@ -102,7 +112,20 @@ namespace ImageSRBasic {
 	
 	class VideoMan { // VideoManager
 	protected:
-		path inputPath; // OnlyPath ?
+		path sourcePath, tmpdirPath; // OnlyPath ?
+	public:
+		static size_t MAXLENGTH; // max length of the tmpdir name to random.
+		static path TMPDIRROOT; // parent path of the tmpdirs.
+		VideoMan() {
+			sourcePath = path();
+			tmpdirPath = TMPDIRROOT / getRandomString(MAXLENGTH);
+		}
+		
+		bool setSourcePath(const path& sourcePath);
+		bool setTmpdirName(const path& tmpdirName);
+		
+		path getSourcePath() const;
+		path getTmpdirPath() const;
 	};
 
 	// FileConfig
@@ -178,6 +201,18 @@ namespace ImageSRBasic {
 	void Config::setRecursive() 	{ this->isRecursive = true; }
 	void Config::unsetRecursive() 	{ this->isRecursive = false; }
 	std::set<std::wstring> Config::getExtSelector()	const { return extSelector; }
+	
+	// VideoMan
+	bool VideoMan::setSourcePath(const path& sourcePath) {
+		this->sourcePath = sourcePath;
+		return false; // maybe I should check something here?
+	}
+	bool VideoMan::setTmpdirName(const path& tmpdirName) {
+		this->tmpdirPath = TMPDIRROOT / tmpdirName;
+		return false;
+	}
+	path VideoMan::getSourcePath() const { return sourcePath; }
+	path VideoMan::getTmpdirPath() const { return tmpdirPath; }
 }
 
 #endif

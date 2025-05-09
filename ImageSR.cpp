@@ -6,7 +6,11 @@ using namespace std;
 using namespace ImageSRBasic;
 
 // rootpath: root of the project.
-filesystem::path FileConfig::ROOTPATH = getExecPath().parent_path(); // some problem here!!!
+filesystem::path FileConfig::ROOTPATH = getExecPath().parent_path();
+// maxlength: max length of the tmpdir name to random.
+size_t VideoMan::MAXLENGTH = 16;
+// tmpdirroot: parent path of the tmpdirs.
+filesystem::path VideoMan::TMPDIRROOT = filesystem::temp_directory_path() / "ImageSR_Toolkit";
 
 #define Waifu2x_Anime L"models-upconv_7_anime_style_art_rgb"
 #define Waifu2x_Photo L"models-upconv_7_photo"
