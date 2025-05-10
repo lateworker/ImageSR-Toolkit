@@ -30,7 +30,7 @@ ImageSR.exe
 
 `ImageSR.exe -i "C:\\in.jpg" -o "D:\\out.jpg" -m realesrgan-anime -s 4`（输入路径是一个文件时，上述后三个开关不是必须的）
 
-## 模型介绍
+## 模型介绍（一定要看！！！）
 
 命令除模型（--model）外都不难理解，故在此特别介绍模型部分。
 
