@@ -12,12 +12,12 @@
 
 **如果程序闪退，大概是你的配置有问题；如果程序抛出了异常说明，并且你看不懂，大概是代码有 BUG。**
 
-这是一个合法的命令例子（为了方便解释换了行）：
+这是一个合法的命令**例子**（为了方便解释换了行）：
 
 ```bat
 ImageSR.exe
-	-i "xxx\\in.jpg"       # '-i' 为输入路径的标示开关，后面跟着待处理的文件路径。注意转义字符 "\\"。
-	--output "D:\\out.jpg" # '--output' 为输出路径的标示开关，后跟输入路径。
+	-i "C:\\in.jpg"       # '-i' 为输入路径的标示开关，后面跟着待处理的文件路径（这里是 `C:\in.jpg`）。注意转义字符 "\\"。
+	--output "D:\\out.jpg" # '--output' 为输出路径的标示开关，后跟输入路径（这里是 `D:\out.jpg`）。
 	                         # 此开关也可记作 '-o'，可以使用 '-h' 查看开关名称。
 	-m realesrgan-anime    # 你要使用的模型，详解见下文。
 	-s 4                   # 图片放大倍数，配合着模型使用，可能还需要 '--denoise' 和 '--syncgap' 开关。
@@ -28,7 +28,7 @@ ImageSR.exe
 
 实际上，上述的例子在 cmd 中长这样：
 
-`ImageSR.exe -i "xxx\\in.jpg" -o "D:\\out.jpg" -m realesrgan-anime -s 4`（输入路径是一个文件时，上述后三个开关不是必须的）
+`ImageSR.exe -i "C:\\in.jpg" -o "D:\\out.jpg" -m realesrgan-anime -s 4`（输入路径是一个文件时，上述后三个开关不是必须的）
 
 ## 模型介绍
 
