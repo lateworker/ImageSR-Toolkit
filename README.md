@@ -75,38 +75,36 @@ ImageSR.exe
 
 1. 关于模型之间的差异（最终效果请自行评判）
 
-   - realesrnet & waifu2x-photo 模型适合超分真实图片。
+  - realesrnet & waifu2x-photo 模型适合超分真实图片。
    
+  - realesrgan-anime 模型适合超分动漫图片。
+
+  - realesrgan-animevideo 模型适合超分动漫视频（或者图片），其在细节上表现不如 realesrgan-anime，但处理速度更快。
+
+  - realcugan 在线条纹理上表现较优，可以保留更多的细节。
    
-      - realesrgan-anime 模型适合超分动漫图片。
-   
-      - realesrgan-animevideo 模型适合超分动漫视频（或者图片），其在细节上表现不如 realesrgan-anime，但处理速度更快。
-   
-      - realcugan 在线条纹理上表现较优，可以保留更多的细节。
-   
-2. 关于性能
+3. 关于性能
 
-     - AI 模型使用显卡放大图片，处理速度取决于显卡算力和图片分辨率。
+  - AI 模型使用显卡放大图片，处理速度取决于显卡算力和图片分辨率。
 
-     - 若没有独显或独显很弱，建议使用 realesrgan-animevideo 模型处理动漫图片，此模型处理速度最快。
+  - 若没有独显或独显很弱，建议使用 realesrgan-animevideo 模型处理动漫图片，此模型处理速度最快。
 
+  - 只有 realesrgan-animevideo 模型为Ram版本（内存版本），没有独显也可以超分大图片。
 
-     - 只有 realesrgan-animevideo 模型为Ram版本（内存版本），没有独显也可以超分大图片。
+  - 对于非Ram版本的模型而言，显存和内存不足 $8\text{GiB}$ 可能会导致崩溃。
 
+  - 受制于硬件性能，模型通常在处理大于 $30\text{MiB}$ 的图片时会崩溃。
 
-     - 对于非Ram版本的模型而言，显存和内存不足 $8\text{GiB}$ 可能会导致崩溃。
+4. 显卡测试1：RX588 ARCAEA-8K-HKT.png 16MiB 7680*4320 
 
-     - 受制于硬件性能，模型通常在处理大于 $30\text{MiB}$ 的图片时会崩溃。
+  - realesrgan 模型，用时30min。
+  
+  - realesrgan-animevideo 模型，用时14min。
 
+5. 关于显存占用问题
 
-3. 显卡测试1：RX588 ARCAEA-8K-HKT.png 16MiB 7680*4320 
+  - 如果使用独显，任务管理器中是看不到显卡占用的；但在NA软件中能看到已经跑满。
+  
+  - 集显占用可以直接在任务管理器中看到。
 
-     - realesrgan 模型，用时30min。
-     - realesrgan-animevideo 模型，用时14min。
-
-4. 关于显存占用问题
-
-     - 如果使用独显，任务管理器中是看不到显卡占用的；但在NA软件中能看到已经跑满。
-     - 集显占用可以直接在任务管理器中看到。
-
-5. **对真实图片进行超分不能使用anime模型！** ~~会有意外惊喜~~
+6. **对真实图片进行超分不能使用anime模型！** ~~会有意外惊喜~~
