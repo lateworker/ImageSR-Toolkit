@@ -75,7 +75,7 @@ ImageSR.exe
 
 1. 关于模型之间的差异（最终效果请自行评判）
 
-  - realesrnet & waifu2x-photo 模型适合超分真实图片。
+    - realesrnet & waifu2x-photo 模型适合超分真实图片。
    
   - realesrgan-anime 模型适合超分动漫图片。
 
