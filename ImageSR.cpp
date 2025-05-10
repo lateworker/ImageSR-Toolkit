@@ -5,12 +5,21 @@
 using namespace std;
 using namespace ImageSRBasic;
 
+
 // rootpath: root of the project.
 filesystem::path FileConfig::ROOTPATH = getExecPath().parent_path();
+// modelpath: parent dirctory of each model.
+filesystem::path FileConfig::MODELPATH[4] = {
+	FileConfig::ROOTPATH / "models",
+	FileConfig::ROOTPATH / "models" / "realesrgan",
+	FileConfig::ROOTPATH / "models" / "waifu2x",
+	FileConfig::ROOTPATH / "models" / "realcugan"
+};
 // maxlength: max length of the tmpdir name to random.
 size_t VideoMan::MAXLENGTH = 16;
 // tmpdirroot: parent path of the tmpdirs.
 filesystem::path VideoMan::TMPDIRROOT = filesystem::temp_directory_path() / "ImageSR_Toolkit";
+
 
 #define Waifu2x_Anime L"models-upconv_7_anime_style_art_rgb"
 #define Waifu2x_Photo L"models-upconv_7_photo"
@@ -26,7 +35,7 @@ void FileConfig::processAsFile() const {
 	switch (getCoreType()) {
 		case REALESR: {
 			const auto& [model, scale] = get<REALESR>(coreConfig);
-			command = (ROOTPATH / "models" / "realesrgan.exe").wstring()
+			command = (MODELPATH[REALESR] / "realesrgan.exe").wstring()
 			          + L" -i " + quote(inputPath.wstring())
 			          + L" -o " + quote(outputPath.wstring())
 			          + L" -n " + quote(model + L"-x" + scale)
@@ -35,7 +44,7 @@ void FileConfig::processAsFile() const {
 		}
 		case WAIFU2X: {
 			const auto& [model, scale, denoise] = get<WAIFU2X>(coreConfig);
-			command = (ROOTPATH / "models" / "waifu2x.exe").wstring()
+			command = (MODELPATH[WAIFU2X] / "waifu2x.exe").wstring()
 			          + L" -i " + quote(inputPath.wstring())
 			          + L" -o " + quote(outputPath.wstring())
 			          + L" -m " + quote(model == L"waifu2x-anime" ? Waifu2x_Anime : Waifu2x_Photo)
@@ -45,7 +54,7 @@ void FileConfig::processAsFile() const {
 		}
 		case REALCUGAN: {
 			const auto& [model, scale, denoise, syncgap] = get<REALCUGAN>(coreConfig);
-			command = (ROOTPATH / "models" / "realcugan.exe").wstring()
+			command = (MODELPATH[REALCUGAN] / "realcugan.exe").wstring()
 			          + L" -i " + quote(inputPath.wstring())
 			          + L" -o " + quote(outputPath.wstring())
 			          + L" -s " + scale
@@ -55,7 +64,7 @@ void FileConfig::processAsFile() const {
 		}
 		default: return; // throw the model error
 	}
-	cout << narrow(command) << "\n";
+	cout << narrow(command) << "\n"; // test massage here
 	cout << narrow(execute(command));
 }
 void Config::processAsDir() const {
@@ -67,10 +76,9 @@ void Config::processAsDir() const {
 		// check selector
 		if (!extSelector.empty() && !extSelector.count(it->path().extension().wstring())) continue;
 
-		FileConfig file;
+		FileConfig file = *this; // pull the basic settings from self.
 		file.setInputPath(it->path());
 		file.setOutputPath(outputPath / relative(it->path(), inputPath));
-		file.setCoreConfig(this->getCoreConfig());
 		file.processAsFile();
 	}
 }
@@ -121,13 +129,16 @@ int parseCommandLine(int argc, char* argv[]) {
 	// apply to the target
 	target.setInputPath(inputPathStr);
 	target.setOutputPath(outputPathStr);
+	
 	target.setCoreModel(coreModel);
 	target.setCoreScale(to_wstring(coreScale));
 	target.setCoreDenoise(to_wstring(coreDenoise));
 	target.setCoreSyncgap(to_wstring(coreSyncgap));
+	
 	target.setExtSelector(extSelector);
-	if (isForced) target.setForced(); else target.unsetForced();
-	if (isRecursive) target.setRecursive(); else target.unsetRecursive();
+	
+	target.isForced = isForced;
+	target.isRecursive = isRecursive;
 	return 0;
 }
 
