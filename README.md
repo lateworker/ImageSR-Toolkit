@@ -47,15 +47,15 @@ ImageSR.exe
 
 - DF2K / DF2K-JPEG（realesr一代模型）
   
-  - 放大倍数：**4**
+    - 放大倍数：**4**
 
 - realesrgan / realesrnet / realesrgan-anime（realesr二代模型）
   
-  - 放大倍数：**4**
+    - 放大倍数：**4**
 
 - realesrgan-animevideo（realesr三代模型，使用内存，针对视频超分做了特异性优化）
   
-  - 放大倍数：2 / 3 / **4**
+    - 放大倍数：2 / 3 / **4**
 
 - realcugan
   
