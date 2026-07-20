@@ -22,7 +22,7 @@ ImageSR.exe
 	-m realesrgan-anime    # 你要使用的模型，详解见下文。
 	-s 4                   # 图片放大倍数，配合着模型使用，可能还需要 '--denoise' 和 '--syncgap' 开关。
 	--extension jpg png    # 文件后缀名选择器，在此表示只处理 jpg 和 png 格式的图片。
-	--recursive            # 递归处理子文件夹。
+	--recurse              # 递归处理子文件夹。
 	--force                # 若输出路径存在，强制覆盖已有的文件。
 ```
 
