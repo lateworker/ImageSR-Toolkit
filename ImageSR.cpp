@@ -1,4 +1,3 @@
-#include <bits/stdc++.h>
 #include "include/basic.hpp"
 #include "include/CLI11.hpp"
 
@@ -121,8 +120,8 @@ int parseCommandLine(int argc, char* argv[]) {
 	bool isForced = false;
 	app.add_flag("-f,--force", isForced, "Overwrite output path in force") -> default_val("false");
 	// isRecursive
-	bool isRecursive = true;
-	app.add_flag("-r,--recurse", isRecursive, "Go into the subdir to process") -> default_val("true");
+	bool isRecursive = false;
+	app.add_flag("-r,--recurse", isRecursive, "Go into the subdir to process") -> default_val("false");
 
 	CLI11_PARSE(app, argc, argv);
 

@@ -1,7 +1,10 @@
 #ifndef ImageSRBasic_HPP
 #define ImageSRBasic_HPP
 
-#include <bits/stdc++.h>
+#include <filesystem>
+#include <random>
+#include <variant>
+#include <set>
 #include <windows.h>
 
 // you have to "chcp 65001" manually.
